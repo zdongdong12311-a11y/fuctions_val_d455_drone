@@ -1,0 +1,68 @@
+%YAML:1.0
+
+#common parameters
+#support: 1 imu 1 cam; 1 imu 2 cam: 2 cam; 
+imu: 1         
+num_of_cam: 2  
+
+imu_topic: "/camera/imu"
+image0_topic: "/camera/infra1/image_rect_raw"
+image1_topic: "/camera/infra2/image_rect_raw"
+output_path: "/home/orangepi/output/"
+
+cam0_calib: "left.yaml"
+cam1_calib: "right.yaml"
+image_width: 848
+image_height: 480
+   
+
+# Extrinsic parameter between IMU and Camera.
+estimate_extrinsic: 1   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
+                        # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
+
+body_T_cam0: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: d
+   data: [ 0.9999866787902377, 0.0003351041731369541, 0.005150722984386569, -0.0003416631798052848,
+        -0.00035374584304336844, 0.9999933897385881, 0.0036187488176945824, -0.0003319522832053545,
+       -0.00514947627893084, -0.003620522658426902, 0.9999801871585913, 0.00019951539090783978, 
+       0.0, 0.0, 0.0, 1.0 ]
+
+body_T_cam1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: d
+   data: [ 0.9999998174237544, 0.0003592056471619468, -0.00048592567483657725, 0.09712191204114588,-0.0003600554178507275, 0.9999984042592938, -0.0017498111219854898, -0.0014670932525418223,0.00048529635738871364, 0.001749985762683442, 0.9999983510172786, -0.0026169069733666403, 0.0, 0.0, 0.0, 1.0 ]
+
+#Multiple thread support
+multiple_thread: 1
+
+#feature traker paprameters
+max_cnt: 150            # max feature number in feature tracking
+min_dist: 30            # min distance between two features 
+freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
+F_threshold: 1.0        # ransac threshold (pixel)
+show_track: 0           # publish tracking image as topic
+flow_back: 1            # perform forward and backward optical flow to improve feature tracking accuracy
+
+#optimization parameters
+max_solver_time: 0.04  # max solver itration time (ms), to guarantee real time
+max_num_iterations: 8   # max solver itrations, to guarantee real time
+keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
+
+#imu parameters       The more accurate parameters you provide, the better performance
+acc_n: 0.5560834608595348          # accelerometer measurement noise standard deviation. #0.2   0.04
+gyr_n: 0.005699531545276787         # gyroscope measurement noise standard deviation.     #0.05  0.004
+acc_w: 0.017910917044357936         # accelerometer bias random work noise standard deviation.  #0.002
+gyr_w: 0.00032787205845529865       # gyroscope bias random work noise standard deviation.     #4.0e-5
+g_norm: 9.805         # gravity magnitude
+
+#unsynchronization parameters
+estimate_td: 1                      # online estimate time offset between camera and imu
+td: 0.00                             # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+
+#loop closure parameters
+load_previous_pose_graph: 0        # load and reuse previous pose graph; load from 'pose_graph_save_path'
+pose_graph_save_path: "/home/orangepi/output/pose_graph/" # save and load path
+save_image: 0                   # save image in pose graph for visualization prupose; you can close this function by setting 0 
