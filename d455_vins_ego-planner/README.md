@@ -1,0 +1,116 @@
+一、安装mavros：
+# 1. 安装 mavros 及扩展包
+sudo apt-get install ros-noetic-mavros ros-noetic-mavros-extras ros-noetic-mavros-msgs
+
+# 2. 安装 GeographicLib 数据集（必须，否则节点无法启动）
+wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+chmod +x install_geographiclib_datasets.sh
+sudo bash install_geographiclib_datasets.sh
+
+# 确认包已安装
+rospack find mavros
+# 查看可用 launch 文件（APM / PX4）
+ls /opt/ros/noetic/share/mavros/launch/
+
+二、驱动sdk安装：
+ubuntu20.04(noetic)
+D455固件版本：5.15.0.2
+固件官网下载：https://dev.realsenseai.com/docs/firmware-releases-d400
+
+
+1、依赖安装：
+sudo apt update
+sudo apt install git cmake g++ libssl-dev libusb-1.0-0-dev
+libudev-dev pkg-config libgtk-3-dev libglfw3-dev -y
+
+2、驱动下载：
+git clone https://github.com/realsenseai/librealsense.git（用的是V2.57.7版本）
+
+3、编译：
+cd librealsense
+sudo ./scripts/setup_udev_rules.sh
+mkdir build && cd build
+cmake .. -DBUILD_EXAMPLES=true -DBUILD_GRAPHICAL_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=true
+cmake .. \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DBUILD_EXAMPLES=true \
+    -DBUILD_GRAPHICAL_EXAMPLES=true \
+    -DCMAKE_BUILD_TYPE=release \
+    -DFORCE_RSUSB_BACKEND=true \
+    -DBUILD_PYTHON_BINDINGS=true \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+    -DBUILD_TOOLS=true
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+
+4、检验：
+rs-enumerate-devices -o  查看是否有输出
+
+5、常见问题：
+（1）虽然lsusb识别到了，但realsense-viewer这个工具识别不到 （这个一般是SDK版本与固件版本不配备，这个自己试,还有试试插拔）
+（2）realsense-viewer这个工具识别到了，但IMU没了，这个是用在cmake后面加-DFORCE_RSUSB_BACKEND=true（用USB后端编译）
+
+三、realsense的ros包安装：
+
+# 1. 克隆 realsense-ros 到工作空间
+cd ~/realsense_ws/src
+git clone https://github.com/IntelRealSense/realsense-ros.git -b ros1-legacy
+
+# 2. 安装依赖并编译
+cd ~/realsense_ws
+rosdep install --from-paths src --ignore-src -y
+catkin_make
+source devel/setup.bash
+
+四、安装vins-fusion：
+1、安装依赖：
+# Ceres Solver（必须）
+sudo apt-get install -y libceres-dev
+# OpenCV（Noetic 默认已带 4.x，一般无需额外安装）
+sudo apt-get install -y libopencv-dev
+# 其他依赖
+sudo apt-get install -y libeigen3-dev libboost-all-dev
+
+2、克隆源码：
+cd ~/vins_ws/src
+# 官方仓库
+git clone https://github.com/HKUST-Aerial-Robotics/VINS-Fusion.git
+3、编译：
+cd ~/catkin_ws
+catkin_make -j4
+source devel/setup.bash
+常见问题：Ⅰ、error: 'CV_LOAD_IMAGE_GRAYSCALE' was not declared
+解决方法：将代码中旧 API 替换：
+// 旧（OpenCV 3）
+CV_LOAD_IMAGE_GRAYSCALE  →  cv::IMREAD_GRAYSCALE
+CV_BGR2GRAY              →  cv::COLOR_BGR2GRAY
+CV_GRAY2RGB              →  cv::COLOR_GRAY2BGR
+或者直接用打好补丁的分支：
+git clone https://github.com/zinuok/VINS-Fusion.git  # 社区修复版
+Ⅱ、cv_bridge 与 OpenCV 4 冲突
+解决：sudo apt-get install ros-noetic-cv-bridge
+Ⅲ、loop_fusion 模块编译失败
+解决：catkin_make --pkg camera_models vins loop_fusion -j4
+
+4、验证：
+# 终端1：启动 roscore
+roscore
+# 终端2：运行 VINS-Fusion
+rosrun vins vins_node \
+  ~/catkin_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml
+# 终端3：播放数据包
+rosbag play YOUR_EUROC_BAG.bag
+
+5、目录结构说明：
+VINS-Fusion/
+├── camera_models/     # 相机模型
+├── vins_estimator/    # 核心估计器
+├── loop_fusion/       # 回环检测
+├── global_fusion/     # GPS 融合（可选）
+└── config/            # 各传感器配置文件
+    ├── euroc/
+    ├── realsense_d435i/   ← 你用 RealSense 的话用这个
+    └── ...
+
+五、根据kalib_标定进行标定
