@@ -148,9 +148,9 @@ import cv_bridge
 
 三、IMU+双目相机标定：
 
-1、编写chain.yaml，格式参考Kalibr官方教程https://github.com/ethz-asl/kalibr/wiki/yaml-formats中的chain.yaml，具体的参数参考上面得到的多目标定的yaml文件，没有的参数可以删除。
+1、编写chain.yaml，格式参考Kalibr官方教程https://github.com/ethz-asl/kalibr/wiki/yaml-formats 中的chain.yaml，具体的参数参考上面得到的多目标定的yaml文件，其中cam0和cam1分别指的是红外左右目，cam1和没有的参数可以删除。
 
-2、编写imu.yaml，格式参考https://github.com/ethz-asl/kalibr/wiki/yaml-formats中的imu.yaml，具体参数使用之前imu标定得到的参数、没有的参数可以删除。
+2、编写imu.yaml，格式参考https://github.com/ethz-asl/kalibr/wiki/yaml-formats 中的imu.yaml，具体参数使用之前imu标定得到的参数、没有的参数可以删除。
 
 3、准备好april_129_A4.yaml
 
