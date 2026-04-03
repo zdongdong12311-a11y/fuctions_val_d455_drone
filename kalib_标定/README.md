@@ -33,6 +33,9 @@ catkin_make
 参考官方教程https://github.com/ethz-asl/kalibr/wiki/installation，建议用源码安装
 (1)kalibr编译错误关于cv2-bridge，把import cv2改到
 import cv2-bridge之前。
+验证安装：source ~/kalibr_workspace/devel/setup.bash
+kalibr_calibrate_cameras --help
+kalibr_calibrate_imu_camera --help
 
 5、标定：
 (1)找到realsense-ros包，进入/catkin_ws/src/realsense-ros/realsense2_camera/launch（路径仅供参考），修改其中的rs_camera.launch的参数。
