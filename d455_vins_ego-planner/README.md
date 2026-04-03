@@ -17,7 +17,6 @@ ubuntu20.04(noetic)
 D455固件版本：5.15.0.2
 固件官网下载：https://dev.realsenseai.com/docs/firmware-releases-d400
 
-
 1、依赖安装：
 sudo apt update
 sudo apt install git cmake g++ libssl-dev libusb-1.0-0-dev
@@ -112,5 +111,14 @@ VINS-Fusion/
     ├── euroc/
     ├── realsense_d435i/   ← 你用 RealSense 的话用这个
     └── ...
+    
+四.五、如果ceres-solver没有安装先安装ceres：
+git clone https://ceres-solver.googlesource.com/ceres-solver
+cd ceres-solver
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local   # 可指定安装路径，例如 /usr/local
+make -j$(nproc)   # 使用所有CPU核心并行编译
+make test         # 可选，运行测试套件
+sudo make install # 安装到系统目录
 
 五、根据kalib_标定进行标定
