@@ -30,9 +30,7 @@ cd ..
 catkin_make
 
 4、下载编译Kalibr
-参考官方教程https://github.com/ethz-asl/kalibr/wiki/installation，建议用源码安装
-(1)kalibr编译错误关于cv2-bridge，把import cv2改到
-import cv2-bridge之前。
+参考官方教程https://github.com/ethz-asl/kalibr/wiki/installation，建议用源码
 验证安装：source ~/kalibr_workspace/devel/setup.bash
 kalibr_calibrate_cameras --help
 kalibr_calibrate_imu_camera --help
