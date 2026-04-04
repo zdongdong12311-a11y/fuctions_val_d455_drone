@@ -47,6 +47,7 @@ kalibr_calibrate_imu_camera --help
 Ⅱ.打开imu的加速度计和陀螺仪并合并为一个topic
 <arg name="enable_gyro" default="true"/>
 <arg name="enable_accel" default="true"/>
+<arg name="unite_imu method" default="linear_interpolation"/>
 (2)启动命令为roslaunch realsense2_camera rs_camera.launch
 (3)编辑启动文件:
 gedit ~/imu_catkin_ws/src/imu_utils/launch/d455_imu_calibration.launch
