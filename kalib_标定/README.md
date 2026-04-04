@@ -36,7 +36,17 @@ kalibr_calibrate_cameras --help
 kalibr_calibrate_imu_camera --help
 
 5、标定：
-(1)找到realsense-ros包，进入/catkin_ws/src/realsense-ros/realsense2_camera/launch（路径仅供参考），修改其中的rs_camera.launch的参数。
+(1)找到realsense-ros包，进入/catkin_ws/src/realsense-ros/realsense2_camera/launch（路径仅供参考），修改其中的rs_camera.launch的参数：\
+Ⅰ.打开双目，修改图片的width、height
+<arg name="infra_width" default="848"/>
+<arg name="infra_height" default="480"/>
+<arg name="enable_infra" default="true"/>
+<arg name="enable_infral" default="true"/>
+<arg name="enable_infra2" default="true"/>
+<arg name="infra_rgb" default="false"/>
+Ⅱ.打开imu的加速度计和陀螺仪并合并为一个topic
+<arg name="enable_gyro" default="true"/>
+<arg name="enable_accel" default="true"/>
 (2)启动命令为roslaunch realsense2_camera rs_camera.launch
 (3)编辑启动文件:
 gedit ~/imu_catkin_ws/src/imu_utils/launch/d455_imu_calibration.launch
