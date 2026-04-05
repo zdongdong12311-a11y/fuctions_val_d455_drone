@@ -191,7 +191,7 @@ rosrun topic_tools throttle messages /camera/imu 200.0 /imu
 rosbag record -O imu_stereo.bag /infra_left /infra_right /imu
 
 10、标定：
-rosrun kalibr kalibr_calibrate_cameras --bag /home/imu_stereo.bag --cam /home/chain.yaml --imu /home/imu.yaml --target /home/april_129_A4.yaml --bag-from-to 2 146 --show-extraction
+rosrun kalibr kalibr_calibrate_imu_cameras --bag /home/lsf/桌面/imu_stereo.bag --cam /home/lsf/桌面/chain.yaml --imu /home/lsf/桌 面/imu.yaml --target /home/lsf/桌面/129.yaml --bag-from-to 3 177 --show-extraction --models pinhole-radtan pinhole-radtan pinhole-radtan --topics /infra_left /infra_right /imu --approx-sync 0.04
 最终得到的结果为yaml，txt，和pdf文件
 标定结果的好坏可以看results-imucam-homezjimu_stereo.txt中的重投影误差Reprojection error，两个相机都在0.15以下说明标定的结果比较好
 
