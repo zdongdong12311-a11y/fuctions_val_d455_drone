@@ -17,7 +17,7 @@ class VinsMavrosMerged:
         self.estimated_odom_rec_flag = False
 
         # --- 1. 原封不动继承 VINS 坐标转换参数 ---
-        self.publish_rate = rospy.get_param('~publish_rate', 30)
+        self.publish_rate = rospy.get_param('~publish_rate', 200)
         self.swap_xy = rospy.get_param('~swap_xy', True)
         self.swap_xz = rospy.get_param('~swap_xz', False)
         self.negate_x = rospy.get_param('~negate_x', False)
@@ -37,10 +37,15 @@ class VinsMavrosMerged:
 
         # --- 3. 订阅与发布 ---
         self.px4_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.px4_pose_cb)
-        self.odom_sub = rospy.Subscriber("/vins_estimator/odometry", Odometry, self.odom_cb)
+        self.odom_sub = rospy.Subscriber("/loop_fusion/odometry_rect", Odometry, self.odom_cb)
         self.vision_pose_pub = rospy.Publisher("/mavros/vision_pose/pose", PoseStamped, queue_size=10)
         
         self.tf_broadcaster = tf.TransformBroadcaster()
+        
+        # 添加打印频率参数
+        self.print_rate = rospy.get_param('~print_rate', 20)
+        self.last_print_time = rospy.Time.now()
+        
         self.rate = rospy.Rate(self.publish_rate)
 
         rospy.loginfo("VINS to PX4 Merged Node Initialized.")
@@ -117,6 +122,8 @@ class VinsMavrosMerged:
             else:
                 # 1. 发布转换后的位姿给 PX4
                 stamp = rospy.Time.now()
+
+                
                 self.estimated_pose.header.stamp = stamp
                 self.vision_pose_pub.publish(self.estimated_pose)
 
@@ -130,23 +137,26 @@ class VinsMavrosMerged:
                 )
 
                 # 3. 极其整齐的一列列看板打印
-                lines = []
-                lines.append("\033[K\033[32m[ VINS -> PX4 Bridge OK ]\033[0m")
-                lines.append("\033[K       VinsPose(Transformed)      px4Pose")
-                lines.append(f"\033[Kx      {pos.x:10.4f}\t\t{self.px4_pose.pose.position.x:10.4f}")
-                lines.append(f"\033[Ky      {pos.y:10.4f}\t\t{self.px4_pose.pose.position.y:10.4f}")
-                lines.append(f"\033[Kz      {pos.z:10.4f}\t\t{self.px4_pose.pose.position.z:10.4f}")
-                lines.append(f"\033[Kpitch  {self.estimated_attitude['pitch']:10.4f}\t\t{self.px4_attitude['pitch']:10.4f}")
-                lines.append(f"\033[Kroll   {self.estimated_attitude['roll']:10.4f}\t\t{self.px4_attitude['roll']:10.4f}")
-                lines.append(f"\033[Kyaw    {self.estimated_attitude['yaw']:10.4f}\t\t{self.px4_attitude['yaw']:10.4f}")
+                if rospy.Time.now() - self.last_print_time >= rospy.Duration(1.0 / self.print_rate):
+                    lines = []
+                    lines.append("\033[K\033[32m[ VINS -> PX4 Bridge OK ]\033[0m")
+                    lines.append("\033[K       VinsPose(Transformed)      px4Pose")
+                    lines.append(f"\033[Kx      {pos.x:10.4f}\t\t{self.px4_pose.pose.position.x:10.4f}")
+                    lines.append(f"\033[Ky      {pos.y:10.4f}\t\t{self.px4_pose.pose.position.y:10.4f}")
+                    lines.append(f"\033[Kz      {pos.z:10.4f}\t\t{self.px4_pose.pose.position.z:10.4f}")
+                    lines.append(f"\033[Kpitch  {self.estimated_attitude['pitch']:10.4f}\t\t{self.px4_attitude['pitch']:10.4f}")
+                    lines.append(f"\033[Kroll   {self.estimated_attitude['roll']:10.4f}\t\t{self.px4_attitude['roll']:10.4f}")
+                    lines.append(f"\033[Kyaw    {self.estimated_attitude['yaw']:10.4f}\t\t{self.px4_attitude['yaw']:10.4f}")
 
-                output = "\n".join(lines)
-                sys.stdout.write(output + "\n")
-                sys.stdout.flush()
+                    output = "\n".join(lines)
+                    sys.stdout.write(output + "\n")
+                    sys.stdout.flush()
 
-                # 光标上移，完美覆盖不闪烁
-                sys.stdout.write(f"\033[{LINES_TO_OVERWRITE}A")
-                sys.stdout.flush()
+                    # 光标上移，完美覆盖不闪烁
+                    sys.stdout.write(f"\033[{LINES_TO_OVERWRITE}A")
+                    sys.stdout.flush()
+
+                    self.last_print_time = rospy.Time.now()
 
             self.rate.sleep()
 
