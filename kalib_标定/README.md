@@ -7,7 +7,7 @@ cd ..
 catkin_make
 source ~/imu_catkin_ws/devel/setup.bash
 
-2、编译imu：
+2、编译：
 cd ~/imu_catkin_ws/src
 git clone https://github.com/gaowenliang/code_utils.git
 cd ..
