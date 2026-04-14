@@ -192,9 +192,12 @@ rosrun vins vins_node ~/catkin_ws/src/VINS-Fusion/config/yourconfig_path/your_co
 terminal3:
 roslaunch mavros px4.launch
 terminal4:
-python3 
+python3 ~/yourpath/d455_vins_ego-planner/fuctions_ws/src/fuctions/scripts/vins-to-px4.py
+观察terminal4的数据版数据是否发生飘逸现象，慢慢举高飞机转个8字形，并且转换俯仰，偏转，和偏航，使455适应环境，慢慢放下飞机。
+如果数据没问题
+是用遥控器起飞，并悬停一段时间观察是否有问题。
 
-八、ego-planner安装：
+九、ego-planner安装：
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src
 git clone https://github.com/ZJU-FAST-Lab/ego-planner.git
