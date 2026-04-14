@@ -208,8 +208,6 @@ rosbag record -O imu_stereo.bag /infra_left /infra_right /imu
 （2）right.yaml
 （3）realsense_stereo_imu_config.yaml
 
-五、special:飞控与d455的外参矩阵标定：
-
 WARN：可以直接查看和使用官方标定好的left.yaml、right.yaml的内参数据:
 在realsense-ros工作空间下：roslaunch realsense2_camera rs_camera.launch
 Ⅰ、左目：rostopic echo /camera/infra1/camera_info
@@ -217,20 +215,8 @@ WARN：可以直接查看和使用官方标定好的left.yaml、right.yaml的内
 得到：[fx,cx]
       [fy,cy]的参数矩阵
 直接修改即可.
-
-1、启动px4:
-roslaunch mavros Px4.launch
-2、修改realsense_stereo_imu_config.yaml中的imu话题，改为：imu/mavros/data_raw
-并根据realsense_stereo_imu_config.yaml里面outpath的路径建文件夹
-3、先测量d455相对于飞控的实际物理偏差值填入~/yourpath/realsense_stereo_imu_config.yaml并将load_previous_pose_graph参数改为1
-启动realsense_stereo_imu_config.yaml：
-rosrun ~/yourpath/realsense_stereo_imu_config.yaml
-4、查看飞机位姿信息：
-rostopic echo /vins_fusion/imu_propagate
-5、拿着飞机在空旷区域缓慢转两圈，最后把飞机放回起飞位置，查看飞机位姿的偏移量，终止程序，在output文件夹里面会生成vio文件，将里面的外参矩阵数据覆盖到realsense_stereo_imu_config.yaml里的参数矩阵。
-6、重复操作直到偏移量达到自己的要求。
+但官方的数据不一定值得相信。
 
 WARNNNN：飞控不好用d455的imu
-
 参考：https://blog.csdn.net/qq_40186909/article/details/113104595
 感谢这篇文章的指导，感激不尽。
