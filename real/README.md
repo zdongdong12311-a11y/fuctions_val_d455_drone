@@ -138,7 +138,6 @@ sudo make install # 安装到系统目录
 搜索 EKF2_EV_CTRL (如果是旧版固件，搜 EKF2_AID_MASK)
 勾选以下项（开启外部视觉融合）：
 ☑️ Horizontal position fusion (水平位置)
-☑️ Vertical position fusion (垂直位置)
 ☑️ Yaw fusion (偏航角/航向)
 🔍 搜索 EKF2_HGT_MODE
 修改为：Vision （高度融合模式：废弃气压计，用视觉定高。室内气压计会被空调风吹乱！）
